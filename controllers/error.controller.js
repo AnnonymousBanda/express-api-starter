@@ -1,16 +1,42 @@
+class AppError extends Error {
+	constructor(message, status) {
+		super(message)
+		this.status = status
+		this.isOperational = true
+
+		Error.captureStackTrace(this, this.constructor)
+	}
+}
+
 const handleDevError = (err, res) => {
-	return res.status(500).json({
-		status: 500,
+	const status = err.status || 500
+	return res.status(status).json({
+		status: status,
 		message: err.message,
 		stack: err.stack,
 	})
 }
 
 const handleProdError = (res) => {
-	return res.status(500).json({
-		status: 500,
-		message: 'Internal Server Error',
-	})
+	if (err.isOperational) {
+		return res.status(err.status).json({
+			status: err.status,
+			message: err.message,
+		})
+	} else {
+		return res.status(500).json({
+			status: 500,
+			message: 'Something went wrong! Please try again later.',
+		})
+	}
+}
+
+const notFound = (req, res, next) => {
+	const error = new AppError(
+		`Can't find ${req.originalUrl} on this server!`,
+		404
+	)
+	next(error)
 }
 
 const globalErrorHandler = (err, req, res, next) => {
@@ -23,18 +49,4 @@ const globalErrorHandler = (err, req, res, next) => {
 	}
 }
 
-process.on('unhandledRejection', (err) => {
-	console.log('unhandledRejection!')
-	console.error(err)
-
-	process.exit(1)
-})
-
-process.on('uncaughtException', (err) => {
-	console.log('uncaughtException!')
-	console.error(err)
-
-	process.exit(1)
-})
-
-module.exports = { globalErrorHandler }
+module.exports = { notFound, globalErrorHandler, AppError }
