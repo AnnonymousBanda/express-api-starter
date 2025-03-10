@@ -17,7 +17,7 @@ const handleDevError = (err, res) => {
 	})
 }
 
-const handleProdError = (res) => {
+const handleProdError = (err, res) => {
 	if (err.isOperational) {
 		return res.status(err.status).json({
 			status: err.status,
@@ -45,7 +45,7 @@ const globalErrorHandler = (err, req, res, next) => {
 	if (process.env.NODE_ENV === 'development') {
 		return handleDevError(err, res)
 	} else {
-		return handleProdError(res)
+		return handleProdError(err, res)
 	}
 }
 
