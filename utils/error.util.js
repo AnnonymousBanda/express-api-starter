@@ -1,5 +1,15 @@
 const { disconnectDB } = require('../database')
 
+class AppError extends Error {
+	constructor(message, status) {
+		super(message)
+		this.status = status
+		this.isOperational = true
+
+		Error.captureStackTrace(this, this.constructor)
+	}
+}
+
 const uncaughtException = () => {
 	process.on('uncaughtException', async (err) => {
 		console.log('UNCAUGHT EXCEPTION! Shutting down...')
@@ -36,4 +46,4 @@ const catchAsync = (fn) => {
 	}
 }
 
-module.exports = { unhandledRejection, uncaughtException, catchAsync }
+module.exports = { AppError, unhandledRejection, uncaughtException, catchAsync }

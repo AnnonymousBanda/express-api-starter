@@ -1,12 +1,4 @@
-class AppError extends Error {
-	constructor(message, status) {
-		super(message)
-		this.status = status
-		this.isOperational = true
-
-		Error.captureStackTrace(this, this.constructor)
-	}
-}
+const { AppError } = require("../utils/error.util")
 
 const handleDevError = (err, res) => {
 	const status = err.status || 500
@@ -49,4 +41,4 @@ const globalErrorHandler = (err, req, res, next) => {
 	}
 }
 
-module.exports = { notFound, globalErrorHandler, AppError }
+module.exports = { notFound, globalErrorHandler }
